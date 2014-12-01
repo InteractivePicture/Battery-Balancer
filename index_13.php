@@ -1,0 +1,848 @@
+<?php
+
+$left = 1100;
+
+
+/*
+435,558#436,871#132,866#134,1299#263,1300#
+*/
+
+?>
+<!doctype html>
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>Victron Energy - Battery Balancer</title>
+<!--
+<link rel="stylesheet" href="styles.css">
+-->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+
+<script src="jquery-ui-1.11.2.custom/jquery-1.10.2.js"></script>
+<script src="jquery-ui-1.11.2.custom/jquery-ui.js"></script>
+
+<style>
+#container{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 1080px;
+	height: 1920px;
+	background-image: url(images/layout_10.jpg);
+}
+/* alarm */
+#DoBalance{ 
+	position:absolute;
+	top: 100px;
+	left: 700px;
+	width: 400px;
+	height: 30px;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+	color:#fff;
+	background-color: #f00;
+
+}
+#BatteryBalancer{ 
+	position:absolute;
+	top: 200px;
+	left: 700px;
+	width: 630px;
+	height: 550px;
+	background-color: #eee;
+}
+.led {
+	position:absolute;
+	width:30px;
+	height:44px;
+}
+#battery_system {
+	position: absolute;
+	top: 0px;
+	left: 1100px;
+	width: 450px;
+	height: 800px;
+	background-color: #eee;
+	border: 1px solid #000;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+}
+#battery_level {
+	position: absolute;
+	top: 50px;
+	left: 1101px;
+	width: 450px;
+	height: 30px;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+	color: #fff;
+	background-color: #0c0;
+}
+#battery_level_draggeble {
+	position: absolute;
+	cursor: pointer;
+	/* top: -100px; */
+	left: 1100px;
+	width: 450px;
+	height: 30px;
+	border: 1px solid #f00;  
+}
+#battery_level_container {
+	position: absolute;
+	top: -100px;
+	height: 500px;
+	left: 1100px;
+	width: 450px;
+	/* border: 1px solid #f00; */
+}
+#midpoint {
+	position: absolute;
+	top: 160px;
+	left: 1380px;
+	width: 160px;
+	height: 20px;
+	font-size: 14px;
+	text-align: center;
+	border: 1px solid #f00;
+}
+#midpoint_verschil {
+	position: absolute;
+	top: 160px;
+	left: 1101px;
+	width: 450px;
+	height: 20px;
+	font-size: 14px;
+	text-align: center;
+	
+}
+#midpoint_visual {
+	position: absolute;
+	top: 250px;
+	left: 1265px;
+	width: 120px;
+	height: 20px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: none;
+	border-left-style: none;
+	border-top-color: #000;
+	border-right-color: #000;
+	border-bottom-color: #000;
+	border-left-color: #000;
+}
+
+.draggable { 
+	width: 150px; 
+	height: 100px; 
+}
+#battery1,#battery2 { 
+	cursor: pointer;
+	background-color: #ddd;
+}
+#containment1,#containment2 {
+	position: absolute;
+	left:1100px;
+	top: 150px;
+	width: 152px;
+	height: 600px;
+	background-color: #ddd;
+	padding: 5px;
+	margin: 5px;
+}
+
+#container #containment1 #battery1 p, #container #containment2 #battery2 p {
+	text-align: center;
+
+}
+.dot {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+}
+#Currents {
+	position: absolute;
+	width:1080px;
+	height:1920px;
+	top: 0px;	
+	left:0px;
+	border: 1px solid #00f;
+}
+#status {
+	position: absolute;
+	top: 300px;	
+	width:100px;
+	height:100px;
+	border: 1px solid #000;
+}
+</style>
+</head>
+<body>
+
+<div id="DoBalance">Do Balance</div>
+
+<div id="BatteryBalancer">
+	<img src="images/bb.jpg" width="100%" height="100%">
+    <div id="led1" class="led" style="top:44.5%; left:83%"><img src="images/led1.jpg" width="100%" height="100%"></div> 
+	<div id="led2" class="led" style="top:52%; left:83%"><img src="images/led2.jpg" width="100%" height="100%"></div>
+    <div id="led3" class="led" style="top:61%; left:83%"><img src="images/led3.jpg" width="100%" height="100%"></div>
+    <div id="led4" class="led" style="top:68.5%; left:83%"><img src="images/led4.jpg" width="100%" height="100%"></div>
+</div>
+
+<div id="container">
+   	<div id="battery_level_container"></div>
+  <div id="battery_system">
+    
+    
+    </div>
+    <div id="battery_level"></div>
+
+
+  
+  
+    
+    <div id="containment1" style="left:<?php echo $left+5; ?>px;">
+    	<div id="battery1" class="draggable ui-widget-content">
+
+       </div>
+    </div>
+       
+  <div id="containment2" style="left:<?php echo $left+275; ?>px;">
+    	<div id="battery2" class="draggable ui-widget-content">
+
+        </div>
+    </div>
+    
+    <div id="midpoint"></div>
+    <div id="midpoint_verschil"></div>
+    
+    <div id="midpoint_visual"></div>
+    
+</div>
+
+<div id="battery_level_draggeble"></div>
+
+<div id="Currents">
+   	<div id="Cur1">
+    	<div id="Cur1_1"></div><div id="Cur1_2"></div>
+    </div>
+   	<div id="Cur2">
+    	<div id="Cur2_1"></div><div id="Cur2_2"></div><div id="Cur2_3"></div>
+    </div>
+</div>
+
+<!--
+
+-->
+  <div id="status"></div>
+<script type="text/javascript">
+
+var vorig = 0;
+var sprong = 2
+
+var teller1 = 0;
+var teller2 = 0;
+var hoogte1 = 0;
+var hoogte2 = 0;
+var pixels1 = 0;
+var pixels2 = 0;
+
+var grondslag = 13;
+var spreiding = 1.5;
+
+var max_spanning = grondslag + spreiding;
+
+var spanning1 = 0;
+var spanning2 = 0;
+
+var ruimte = 0;
+
+var aantalStappen = 45;
+var stap = 0;
+
+var totalMove = false;
+var aanslag_boven = false;
+var aanslag_onder = false;
+
+// Eerst uitvoeren
+$("#battery1").draggable({ containment: "#containment1", scroll: false });
+$("#battery2").draggable({ containment: "#containment2", scroll: false });
+
+$("#battery_level_draggeble").draggable({ containment: "#battery_level_container", scroll: false });
+
+
+$("#Cur1").hide();
+$("#Cur2").hide();
+$("#DoBalance").hide();
+
+
+
+
+ToonStatus();
+	
+var eindwaarde = 0;//0.4 * ruimte; 
+var startwaarde = 0.7 * ruimte;
+// Dit is de helft van de schaal! halve hoogte
+
+$("#battery1").css("top",startwaarde+"px");
+$("#battery2").css("top",startwaarde+"px");
+
+$("#led1").hide();
+$("#led2").hide();
+$("#led3").hide();
+$("#led4").hide();
+
+
+var totaalafstand = 0;
+ 
+
+$(function() {
+	
+	$(document).mousemove(function(e) {  
+		ToonStatus();
+	});
+
+	$(document).mouseup(function(e) { 
+ 		totalMove = false;
+		if (stap == 0) {  Start(); }
+
+	});
+	
+	$("#battery_level_draggeble").mousedown(function(e) { 
+
+		totalMove = true;
+
+	});
+	
+	function Start() {
+		
+		if (spanning_totaal > 27.3 && Math.abs(midpoint_verschil) > 0.1) {
+		
+		teller1 = parseInt($("#battery1").css("top"));
+		teller2 = parseInt($("#battery2").css("top"));
+		
+		eindwaarde = Math.abs((teller1+teller2)/2);
+		
+		stapgrootte1 = Math.abs(eindwaarde-parseInt($("#battery1").css("top")))/aantalStappen;
+		stapgrootte2 = Math.abs(eindwaarde-parseInt($("#battery2").css("top")))/aantalStappen;
+		
+		// Voorwaarden
+		// spaning groter dan 27,30 V EN
+		// Midvolt spanning groter dan 0,10 V
+		
+		DoBalance();
+		
+		}
+	}
+});
+
+function DoBalance() {
+
+	stap++;
+
+	hoogte1 = parseInt($("#battery1").css("top"));
+	hoogte2 = parseInt($("#battery2").css("top"));
+
+	// Move the batteries
+	if ( hoogte1 < eindwaarde ) {
+		teller1 = teller1 + stapgrootte1;
+ 
+	} else {
+		teller1 = teller1 - stapgrootte1;
+ 	
+	}
+	if ( hoogte2 < eindwaarde ) {
+		teller2 = teller2 + stapgrootte2;
+ 	
+	} else {
+		teller2 = teller2 - stapgrootte2;
+
+	}
+	
+	$("#battery1").css("top",teller1+"px");
+	$("#battery2").css("top",teller2+"px");
+	
+	// Altijd dezelfde hoeveelheid stappen naar balance
+
+	if ( stap < aantalStappen ) {
+			if (midpoint_verschil < 0) {
+				$("#Cur1").show(); 
+			} else {
+				$("#Cur2").show();
+			}
+			setTimeout(DoBalance,40);
+		
+	} else {
+		$("#Cur1").hide(); $("#Cur2").hide(); stap = 0;
+	}
+
+	ToonStatus();
+	
+}
+
+function ToonStatus() {
+	
+	ruimte =  parseInt($("#containment1").css("height")) -  parseInt($("#battery1").css("height")) - 2;
+	
+	hoogte1 = parseInt($("#battery1").css("top"));
+	hoogte2 = parseInt($("#battery2").css("top"));
+	
+	spanning1 = (((ruimte-hoogte1)/ruimte) * spreiding) + grondslag;
+	spanning2 = (((ruimte-hoogte2)/ruimte) * spreiding) + grondslag;
+
+	
+	if (spanning1 > max_spanning || spanning2 > max_spanning) {
+		aanslag_boven = true;
+		if (spanning1 >= spanning2) {
+			if (spanning1 == spanning2) { spanning2 = max_spanning };
+			spanning1 = max_spanning; 
+		} else { spanning2 = max_spanning }
+	}
+	
+	else if (spanning1 < grondslag || spanning2 < grondslag) {
+		aanslag_onder = true;
+		if (spanning1 <= spanning2) { 
+			if (spanning1 == spanning2) { spanning2 = grondslag }; 
+			spanning1 = grondslag; 
+		} else { spanning2 = grondslag }
+	} else {
+		aanslag_boven = false;
+		aanslag_onder = false;
+	}
+	
+	spanning_totaal = spanning1 + spanning2;
+	$("#battery_level").css("top", 650 - 21*spanning_totaal+"px");
+
+	midpoint_verschil = ( spanning2 + spanning1 )/2;
+	
+	
+	$("#battery1").html("<p>Battery pack 1<br><strong>"+spanning1.toFixed(2) +" V</strong><p>");
+	$("#battery2").html("<p>Battery pack 2<br><strong>"+spanning2.toFixed(2) +" V</strong><p>");
+	
+	$("#battery_system").html("Battery System Voltage");
+	$("#battery_level").html(spanning_totaal.toFixed(1)+" V");
+	
+	if (totalMove && vorig > $("#battery_level_draggeble").css("top")) {
+
+		// Just pushdown or pushup!
+ 		aanslag_onder = false;
+		if (!aanslag_boven) {
+			
+			$("#battery1").css("top",hoogte1 - sprong +"px");
+			$("#battery2").css("top",hoogte2 - sprong +"px");
+		}
+	
+	} else if (totalMove && vorig < $("#battery_level_draggeble").css("top")) {
+		aanslag_boven = false;
+
+		if (!aanslag_onder) {
+
+			$("#battery1").css("top",hoogte1 + sprong +"px");
+			$("#battery2").css("top",hoogte2 + sprong +"px");
+		}
+	} else {
+		
+		$("#battery_level_draggeble").css("top", -1+parseInt($("#battery_level").css("top"))+"px"); // + 100 !!!!
+	}
+	vorig = $("#battery_level_draggeble").css("top");
+	
+	hoogte_midpoint = 10 + parseInt($("#containment1").css("top"));
+
+	if (hoogte1 == hoogte2) {
+		midpoint = 0;
+		
+		$("#midpoint").hide();
+		$("#midpoint_visual").css("top",hoogte2+ hoogte_midpoint).css("border-left-style","solid").css("border-right-style","none");
+		$("#midpoint_verschil").css("top",hoogte2-40+hoogte_midpoint+"px");		
+	
+	} else if (hoogte1 > hoogte2) {
+		
+		midpoint = spanning1 - midpoint_verschil;
+		
+		if (Math.abs(midpoint) >= 0.1) {
+				$("#led2").show();
+				$("#led3").hide();
+				
+				if (Math.abs(midpoint) >= 0.2) {
+					$("#led4").show();
+					
+					$("#containment1").css("background-color","#ccc");
+					$("#containment2").css("background-color","#f00");
+		
+				} else {
+					$("#containment1").css("background-color","#ccc");
+					$("#containment2").css("background-color","#ffa700");
+				}
+		}
+			
+		
+		$("#midpoint_visual").css("top",hoogte2+ hoogte_midpoint).css("border-left-style","solid").css("border-right-style","none");
+		$("#midpoint_verschil").css("top",hoogte2-40+hoogte_midpoint+"px");
+	 	$("#midpoint").css("top",hoogte2-20+hoogte_midpoint+"px").css("left","1380px").show();
+	
+	} else {
+		midpoint = spanning2 - midpoint_verschil;
+		
+		if (Math.abs(midpoint) >= 0.1) {
+				$("#led2").hide();
+				$("#led3").show();
+				
+				if (Math.abs(midpoint) >= 0.2) {
+					$("#led4").show();
+					
+					$("#containment1").css("background-color","#f00");
+					$("#containment2").css("background-color","#ccc");
+				} else {
+					$("#containment1").css("background-color","#ffa700");
+					$("#containment2").css("background-color","#ccc");
+				}
+		}
+		
+		$("#midpoint_visual").css("top",hoogte1+ hoogte_midpoint).css("border-left-style","none").css("border-right-style","solid");
+		$("#midpoint_verschil").css("top",hoogte1-40+hoogte_midpoint+"px");
+		$("#midpoint").css("top",hoogte1-20+hoogte_midpoint+"px").css("left","1110px").show();
+	}
+	
+	$("#midpoint_verschil").html("Midpoint<br><strong>"+Math.abs(midpoint_verschil.toFixed(2))+" V</strong>");
+	$("#midpoint").html("<strong>"+midpoint.toFixed(2)+" V</strong>");
+	$("#midpoint_visual").css("height",Math.abs(hoogte1-hoogte2))
+
+
+		
+			/* ---------------------------------------------------------------------- leds
+			if (midpoint.toFixed(2) >= 0.1) {
+				$("#led2").show();
+				$("#led3").hide();
+				
+				if (midpoint.toFixed(2) >= 0.2) {
+					$("#led4").show();
+					
+					$("#containment1").css("background-color","#ccc");
+					$("#containment2").css("background-color","#f00");
+		
+				} else {
+					$("#containment1").css("background-color","#ccc");
+					$("#containment2").css("background-color","#ffa700");
+		
+				}
+			} else if (midpoint.toFixed(2) <= -0.1) {
+				$("#led2").hide();
+				$("#led3").show();
+				
+				if (midpoint.toFixed(2) <= -0.2) {
+					$("#led4").show();
+					
+					$("#containment1").css("background-color","#f00");
+					$("#containment2").css("background-color","#ccc");
+				} else {
+					$("#containment1").css("background-color","#ffa700");
+					$("#containment2").css("background-color","#ccc");
+				}
+			} else {
+				$("#led2").hide();
+				$("#led3").hide();
+				$("#led4").hide();
+				
+				$("#containment1").css("background-color","#ccc");
+				$("#containment2").css("background-color","#ccc");
+			}
+			*/
+			
+	if (spanning_totaal > 27.3) {
+		$("#led1").show();		
+	} else {
+		$("#led1").hide();
+		$("#led2").hide();
+		$("#led3").hide();
+		$("#led4").hide();
+		$("#containment1").css("background-color","#ccc");
+		$("#containment2").css("background-color","#ccc");
+	}
+
+	if (spanning_totaal > 27.3 && Math.abs(midpoint) >= 0.2) {
+ 		$("#led4").show();
+ 
+	} else {
+  		$("#led4").hide();
+	}
+		
+	if (spanning_totaal > 27.3 && Math.abs(midpoint) >= 0.1) {
+
+		$("#DoBalance").show();
+	} else {
+		$("#DoBalance").hide();
+	}
+	
+	
+		
+}
+ToonStatus();
+
+//--------------------------------------------------------------------------------------------------------- Hub 1
+
+function Rood_hub1 (plus) {
+	Rood0_hub1.change_current(plus);
+}
+function Blauw_hub1 (plus) {
+	Links_Rood.change_current(plus);
+	Rechts_Rood.change_current(plus);
+}
+function Wit_hub1 (plus) {
+	Wit0_hub1.change_current(plus);
+	Wit1_hub1.change_current(plus);
+	Wit2_hub1.change_current(plus);
+}
+
+function Stroming_hub1(stroom,lijst,constant,kleur,stroomsterkte) {
+		
+	this.stroom = stroom;
+	this.lijst = lijst;
+	this.constant = constant; 
+ 	this.kleur = kleur;	
+	this.stroomsterkte = stroomsterkte;
+
+	this.change_current = change_current;
+
+	var aantalstappen = 0;
+	
+	var aantalDots = 0;
+	var totaal = 0;	
+	var aantalnods = 1;
+	var start = 0;
+ 	var NewPoint = 0;
+	
+	var current,
+		rev,
+		hoeveel,
+		start_iap_Animate,
+		x_pos,
+		y_pos,
+		hoek,graden,
+		x_stappen,
+		y_stappen,
+		x_stap,
+		y_stap;
+	
+	if (stroomsterkte < 0) { rev = 1; } else { rev = 0; }
+	current = Math.abs(stroomsterkte);
+	
+	var stapgrootte = Math.round( 5 + (10/current));  
+	// 5 - 15
+	var	snelheid = Math.round( 50 + (150/current)); 
+	// 50 - 200
+	
+	Welke_Stroom();
+	
+	var mouseX;
+	var mouseY;
+	
+	$("#Currents").mousemove( function(e) {
+	   mouseX = e.pageX; 
+	   mouseY = e.pageY;
+	   
+	}); 
+	
+	$("#Currents").mousedown(function(){
+		string = mouseX+','+mouseY+'#';
+		res = string.split(',#');
+		$('#status').html(res+'<br>');   
+	});
+	
+	NextPoint(0);
+	Plot();
+	
+	function change_current(plus) {
+		
+		clearInterval(start_iap_Animate);
+		
+		for (aantal=start; aantal<aantalDots; aantal = aantal+stapgrootte) {
+				
+			$("#"+stroom+"dot"+aantal).hide();
+		}
+		
+		if (plus) { stroomsterkte++; } else { stroomsterkte--; }
+		
+		Welke_Stroom();
+		
+		iap_Animate()
+	}
+	
+	function Welke_Stroom() {
+		
+		if (stroomsterkte<0) { rev = 1;} else { rev = 0;}
+		
+		if (stroomsterkte>10) { stroomsterkte = 10;}
+		if (stroomsterkte<-10) { stroomsterkte = -10;}
+		
+		current = Math.abs( stroomsterkte );
+		if (current == 0) { stapgrootte = 100; snelheid = 10000; } else {
+			stapgrootte = Math.round( 5 + (10/current));  
+			snelheid = Math.round( 50 + (150/current)); 	
+		}
+		
+		start = 0;
+		if (rev) {	$('#waarde'+kleur).html('-'); } else { $('#waarde'+kleur).html(''); }
+		if (current == 10) {
+			$('#waarde'+kleur).append('max');
+		} else {
+			$('#waarde'+kleur).append(current);
+		}
+		
+		
+	}
+	
+	function iap_Animate() {
+		
+		var vanaf;
+		
+		start_iap_Animate = setInterval(function(){ 
+
+			for (aantal=start; aantal<aantalDots; aantal = aantal+stapgrootte) {
+					
+					$("#"+stroom+"dot"+aantal).hide();
+			}
+			
+			if (rev) { vanaf = start-1; } else { vanaf = start+1; }
+			for (aantal = vanaf; aantal<aantalDots; aantal = aantal+stapgrootte) {
+					
+					$("#"+stroom+"dot"+aantal).show();
+			}
+			
+			if (rev) { start--; } else { start++; }
+			
+			if (start == stapgrootte) { start = 0;}
+
+			 
+		},snelheid);
+	}
+	
+	function NextPoint(P) {
+ 
+		var x_start = parseInt(lijst[P].split(",")[0]);
+		var y_start = parseInt(lijst[P].split(",")[1]);
+	
+		var x_eind = parseInt(lijst[P+1].split(",")[0]);
+		var y_eind = parseInt(lijst[P+1].split(",")[1]);
+		
+		x_pos = x_start; 
+		y_pos = y_start;
+		
+		var x_afstand = x_eind-x_start;
+		var y_afstand = y_eind-y_start;
+		
+		hoek = Math.atan(y_afstand/x_afstand);
+		graden = hoek/(Math.PI/180);
+	
+		if ((x_afstand <= 0 &&  y_afstand <= 0 ) || (x_afstand < 0 &&  y_afstand > 0 )) { 
+			
+			graden = graden + 180;
+			x_stap = - constant * Math.cos (hoek);  
+			y_stap = - constant * Math.sin (hoek);  
+		}
+		if ((x_afstand > 0 &&  y_afstand < 0 ) || (x_afstand >= 0 &&  y_afstand >= 0 )) { 
+			
+			x_stap = constant * Math.cos (hoek);  
+			y_stap = constant * Math.sin (hoek);  
+		}
+
+		x_stappen =  Math.abs( Math.round (x_afstand / x_stap ));
+		y_stappen =  Math.abs( Math.round (y_afstand / y_stap ));
+		// $('#status').append('stappen : '+x_stappen+' , '+y_stappen+'<br>');
+	
+		//alert (x_stappen+','+y_stappen);
+		
+
+		
+	}
+
+	function Plot() {
+	
+			while (aantalstappen < x_stappen-1 || aantalstappen < y_stappen-1) { 
+				
+				x_pos =  x_pos + x_stap; 
+				y_pos =  y_pos + y_stap;
+		
+				//$(".transporter").css("left",x_pos+"px").css("top",y_pos+"px");
+				verschuiving = 0;
+				x = x_pos-5-verschuiving; y = y_pos-5;
+				$("#"+stroom).append('<div id="'+stroom+'dot'+aantalDots+'"class="dot" style="left:'+x+'px; top:'+y+'px; display:none"></div>');
+				$("#"+stroom+"dot"+aantalDots).css("background","url(images/transporter"+kleur+".png)");
+				// if (rev) { $("#dot"+aantalDots).rotate(graden+180); } else { $("#dot"+aantalDots).rotate(graden); }
+				
+				aantalDots++;
+				aantalstappen++;
+			
+			}
+			
+			aantalstappen = 0;
+			aantalnods++; 
+			NewPoint++;
+			//alert (NewPoint);
+			NextPoint(NewPoint);
+			
+			$('#status').append('aantalnods : '+aantalnods+' , lijst.length : '+lijst.length+'<br>');
+			
+			if (aantalnods < lijst.length-1) { Plot(); } else { 
+			
+				$('#status').append('START DE ANIMATIE'); 
+				iap_Animate ();
+			}
+	
+	}
+}
+
+var Links_Rood = new Stroming_hub1 (
+	"Cur1_1",	// div
+	"441,562#436,871#132,866#134,1299#263,1300#163,1709#356,1709#0,0".split("#"),
+	5,  	// stapgrootte in pixels voor constante snelheid!
+ 	2,		// kleur
+	-3 		//stroomsterkte  -10 tot 10;
+)
+var Links_Zwart = new Stroming_hub1 (
+	"Cur1_2",	// div
+	"499,562#497,876#934,879#934,1311#817,1303#929,1706#736,1708#0,0".split("#"),
+	5,  	// stapgrootte in pixels voor constante snelheid!
+ 	1,		// kleur
+	-3 		//stroomsterkte  -10 tot 10;
+)
+
+// 
+var Rechts_Geel = new Stroming_hub1 (	"Cur2_1",	// div
+	"461,562#464,856#101,854#101,1322#539,1318#552,1341#0,0".split("#"),
+	5,  	// stapgrootte in pixels voor constante snelheid!
+ 	0,		// kleur
+	-3 		//stroomsterkte  -10 tot 10;
+	);
+var Rechts_Zwart = new Stroming_hub1 (
+	"Cur2_2",	// div
+	"499,562#497,876#934,879#934,1311#817,1303#929,1706#736,1708#0,0".split("#"),
+	5,  	// stapgrootte in pixels voor constante snelheid!
+ 	1,		// kleur
+	-3 		//stroomsterkte  -10 tot 10;
+);
+var Rechts_Rood = new Stroming_hub1 (
+	"Cur2_3",	// div
+	"277,1329#169,1711#360,1712#0,0".split("#"),
+	5,  	// stapgrootte in pixels voor constante snelheid!
+ 	2,		// kleur
+	-3 		//stroomsterkte  -10 tot 10;
+);
+
+
+
+
+// var Rood0 = new Stroming ("s3","397,363#402,432#332,470#61,470#0,0".split("#"),5,2,1);
+</script>
+
+
+
+
+</body>
+</html>

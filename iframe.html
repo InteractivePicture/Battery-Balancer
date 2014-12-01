@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>Untitled Document</title>
+
+<script src="jquery-ui-1.11.2.custom/jquery-1.10.2.js"></script>
+<script src="jquery-ui-1.11.2.custom/jquery-ui.js"></script>
+
+<style>
+#wrapper { width: 710px; height: 1420px; padding: 0; overflow: visible; }
+#scaled-frame { width: 1080px; height: 1920px; border: 0px; }
+#scaled-frame {
+    zoom: 0.5;
+    -moz-transform: scale(0.5);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.5);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.5);
+    -webkit-transform-origin: 0 0;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+ #scaled-frame  { zoom: 1;  }
+}
+</style>
+
+</head>
+<body>
+
+<div id="wrapper"><iframe id="scaled-frame" src="index.html" scrolling="no"></iframe></div>
+ 
+</body>
+</html>
